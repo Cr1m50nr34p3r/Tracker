@@ -4,8 +4,6 @@ import time
 import os
 import datetime
 import os.path as path
-import keyboard
-import subprocess
 # change these variables
 logs_dir="C:/Users/aksha/Desktop/Time_Logs"
 
@@ -36,8 +34,12 @@ if path.isdir(logs_dir)==False:
     root_dir=path.realpath(f"{logs_dir}/..")
     os.chdir(root_dir)
     os.mkdir(logs_dir)
-
-f=open(f"{logs_dir}/{current_date}.md","a")
+if path.isfile(f"{logs_dir}/{current_date}.bin"):
+    f=open(f"{logs_dir}/{current_date}.bin","ab")
+else:
+    f=open(f"{logs_dir}/{current_date}.bin","ab")
+    f.write(bytearray("""
+""",'ascii'))
     
 def stopwatch():
     running=True
@@ -58,10 +60,10 @@ def stopwatch():
             start_time=end_time-td
             start_time="{:02d}:{:02d}".format(start_time.hour,start_time.minute)
             end_time="{:02d}:{:02d}".format(end_time.hour,end_time.minute)
-            f.write("""
-""")
-            f.write(f"{name.upper()} - {start_time} - {end_time} - {duration}")
-            print(f"{name.upper()} - {start_time} - {end_time} - {duration}")
+            write_data=f"{name.upper()} - {start_time} - {end_time} - {duration}"
+            write_data_bin=bytearray(write_data,'ascii')
+            f.write(write_data_bin)
+            print(write_data)
             running=False
 def check_log(date):
     logs=os.listdir(logs_dir)
@@ -69,9 +71,9 @@ def check_log(date):
         log_list=log.split('.')
         log=log_list[0]
         if log==date:
-            log_read= open(f"{logs_dir}/{log}.md",'r')
+            log_read= open(f"{logs_dir}/{log}.bin",'rb')
             data=log_read.read()
-            return data        
+            return (data.decode('ascii'))        
 def read_log(date,name):
     start_times=[]
     end_times=[]
@@ -89,10 +91,10 @@ def read_log(date,name):
         dur=datetime.datetime.strptime(duration,"%H:%M:%S")
         td=datetime.timedelta(hours=dur.hour,minutes=dur.minute,seconds=dur.second)
         tds+=td
-    print(f"{name} - ",end="")
+    print(f"{name.upper()} - ",end="")
     print(f"{start_times[0]} - {end_times[0]}")
     whitespaces=len(name)+3
-    for i in range(1,len(start_times)-1):
+    for i in range(1,len(start_times)):
         print(' '*whitespaces,end="")
         print(f"{start_times[i]} - {end_times[i]}")
     print()
