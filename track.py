@@ -89,7 +89,14 @@ def read_log(date,name):
         dur=datetime.datetime.strptime(duration,"%H:%M:%S")
         td=datetime.timedelta(hours=dur.hour,minutes=dur.minute,seconds=dur.second)
         tds+=td
-    print(tds)
+    print(f"{name} - ",end="")
+    print(f"{start_times[0]} - {end_times[0]}")
+    whitespaces=len(name)+3
+    for i in range(1,len(start_times)-1):
+        print(' '*whitespaces,end="")
+        print(f"{start_times[i]} - {end_times[i]}")
+    print()
+    print(f"TOTAL DURATION = {tds}")
 # execute
 if check:
     data=check_log(date)
