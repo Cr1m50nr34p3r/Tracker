@@ -6,41 +6,36 @@ import datetime
 import os.path as path
 # change these variables
 logs_dir="C:/Users/aksha/Desktop/Time_Logs"
-
 # Fixed variables
 now=datetime.datetime.now()
 current_date=datetime.datetime.now().date()
 time_now=datetime.datetime.now().time()
 current_time= "{:02d}:{:02d}".format(time_now.hour,time_now.minute)
-yester_date=current_date-datetime.timedelta(days=1)
-yester_date_format="{:04d}-{:02d}-{:02d}".format(yester_date.year,yester_date.month,yester_date.day)
-
 # initiate argeparse
 parser=argparse.ArgumentParser()
 parser.add_argument('-n', default="unnamed", help="name of the task", type=str)
 parser.add_argument('-c',default=False,help="Check logs",type=bool)
 parser.add_argument('-r',default=False,help="Read logs",type=bool)
 parser.add_argument('-s',default=False,help="start stopwatch",type=bool)
-parser.add_argument('-d',default=yester_date_format,help="date to check for",type=str)
+parser.add_argument('-d',default=current_date,help="date to check for",type=str)
 args=parser.parse_args()
 start=args.s
 name=args.n
 check=args.c
 date=args.d
 read_l=args.r
-# initiate dict
-
+# initiate file
 if path.isdir(logs_dir)==False:
     root_dir=path.realpath(f"{logs_dir}/..")
     os.chdir(root_dir)
     os.mkdir(logs_dir)
-if path.isfile(f"{logs_dir}/{current_date}.bin"):
+if path.isfile(f"{logs_dir}/{current_date}.bin")==False:
     f=open(f"{logs_dir}/{current_date}.bin","ab")
 else:
     f=open(f"{logs_dir}/{current_date}.bin","ab")
     f.write(bytearray("""
 """,'ascii'))
-    
+# functions
 def stopwatch():
     running=True
     seconds=0
