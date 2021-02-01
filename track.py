@@ -54,16 +54,14 @@ def stopwatch():
             dur=datetime.datetime.strptime(timer,"%H:%M:%S")
             duration="{:02d}:{:02d}:{:02d}".format(dur.hour,dur.minute,dur.second)
             td=datetime.timedelta(hours=dur.hour,minutes=dur.minute,seconds=dur.second)
-            print(td)
             end_time=now+td 
             start_time=end_time-td
             start_time="{:02d}:{:02d}".format(start_time.hour,start_time.minute)
-            print(end_time)
             end_time="{:02d}:{:02d}".format(end_time.hour,end_time.minute)
-            print(end_time)
             f.write("""
 """)
             f.write(f"{name.upper()} - {start_time} - {end_time} - {duration}")
+            print(f"{name.upper()} - {start_time} - {end_time} - {duration}")
             running=False
 def check_log(date):
     logs=os.listdir(logs_dir)
