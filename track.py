@@ -9,6 +9,7 @@ logs_dir="C:/Users/aksha/Desktop/Time_Logs"
 # Fixed variables
 now=datetime.datetime.now()
 current_date=datetime.datetime.now().date()
+current_date="{:04d}-{:02d}-{:02d}".format(current_date.year,current_date.month,current_date.day)
 time_now=datetime.datetime.now().time()
 current_time= "{:02d}:{:02d}".format(time_now.hour,time_now.minute)
 # initiate argeparse
