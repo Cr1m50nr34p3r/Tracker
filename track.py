@@ -5,7 +5,7 @@ import os
 import datetime
 import os.path as path
 # change these variables
-logs_dir="C:/Users/aksha/Desktop/Time_Logs"
+logs_dir=""
 # Fixed variables
 now=datetime.datetime.now()
 current_date=datetime.datetime.now().date()
@@ -45,7 +45,7 @@ def stopwatch():
             mins,secs=divmod(seconds,60)
             hours,mins=divmod(mins,60)
             timer="{:02d}:{:02d}:{:02d}".format(hours,mins,secs)
-            print(timer)
+            print(timer,end='\r')
             time.sleep(1)
             seconds+=1
         except KeyboardInterrupt:
