@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # imports
 import argparse
 import time
@@ -29,11 +30,14 @@ read_l=args.r
 if path.exists(logs_dir)==False:
     os.makedirs(logs_dir)
 if path.isfile(f"{logs_dir}/{current_date}.md")==False:
-    f=open(f"{logs_dir}/{current_date}.md","ab")
+    f=open(f"{logs_dir}/{current_date}.md","a")
+    f.write("| Name | Start | End | Duration |")
+    f.write('\n')
+    f.write("| :---: | :---: | :---: |")
+    f.write('\n')
 else:
-    f=open(f"{logs_dir}/{current_date}.md","ab")
-    f.write(bytearray("""
-""",'ascii'))
+    f=open(f"{logs_dir}/{current_date}.md","a")
+    f.write('\n')
 # functions
 def stopwatch():
     running=True
@@ -50,24 +54,28 @@ def stopwatch():
             dur=datetime.datetime.strptime(timer,"%H:%M:%S")
             duration="{:02d}:{:02d}:{:02d}".format(dur.hour,dur.minute,dur.second)
             td=datetime.timedelta(hours=dur.hour,minutes=dur.minute,seconds=dur.second)
-            end_time=now+td 
+            end_time=now+td
             start_time=end_time-td
             start_time="{:02d}:{:02d}".format(start_time.hour,start_time.minute)
             end_time="{:02d}:{:02d}".format(end_time.hour,end_time.minute)
-            write_data=f"`{name.upper()}` - `{start_time}` - `{end_time}` - `{duration}`"
-            write_data_bin=bytearray(write_data,'ascii')
-            f.write(write_data_bin)
-            print(write_data)
+            write_data=f"| {name.upper()} | {start_time} | {end_time} | {duration} |"
+            f.write(write_data)
+            print(f"| {name.upper()} | {start_time} | {end_time} | {duration} |")
+            f.close()
             running=False
+
+
 def check_log(date):
     logs=os.listdir(logs_dir)
     for log in logs:
         log_list=log.split('.')
         log=log_list[0]
         if log==date:
-            log_read= open(f"{logs_dir}/{log}.md",'rb')
+            log_read= open(f"{logs_dir}/{log}.md",'r')
             data=log_read.read()
-            return (data.decode('ascii'))        
+            log_read.close()
+            return data        
+
 def read_log(date,name):
     start_times=[]
     end_times=[]
@@ -76,21 +84,21 @@ def read_log(date,name):
     data=check_log(date)
     data=data.splitlines()
     for line in data:
-        line_l=line.split(' - ')
-        if line_l[0]==f'`{name.upper()}`':
+        line_l=line.split(' | ')
+        if line_l[0]==f'| {name.upper()}':
             start_times.append(line_l[1])
             end_times.append(line_l[2])
             durations.append(line_l[3])
     for duration in durations:
-        dur=datetime.datetime.strptime(duration,'`%H:%M:%S`')
+        dur=datetime.datetime.strptime(duration,'%H:%M:%S |')
         td=datetime.timedelta(hours=dur.hour,minutes=dur.minute,seconds=dur.second)
         tds+=td
-    print(f"{name.upper()} - ",end="")
-    print(f"{start_times[0]} - {end_times[0]}")
+    print(f"{name.upper()} | ",end="")
+    print(f"{start_times[0]} | {end_times[0]}")
     whitespaces=len(name)+3
     for i in range(1,len(start_times)):
         print(' '*whitespaces,end="")
-        print(f"{start_times[i]} - {end_times[i]}")
+        print(f"{start_times[i]} | {end_times[i]}")
     print()
     print(f"TOTAL DURATION = {tds}")
 # execute
