@@ -5,7 +5,7 @@ import os
 import datetime
 import os.path as path
 # change these variables
-logs_dir=""
+logs_dir=os.environ['HOME']+"/.dlogs/.Track/"+ str(round(int(datetime.datetime.now().strftime("%Y")),-1)) + "s/" + datetime.datetime.now().strftime("%Y") + "/" + datetime.datetime.now().strftime("%b") + "/"
 # Fixed variables
 now=datetime.datetime.now()
 current_date=datetime.datetime.now().date()
@@ -26,14 +26,12 @@ check=args.c
 date=args.d
 read_l=args.r
 # initiate file
-if path.isdir(logs_dir)==False:
-    root_dir=path.realpath(f"{logs_dir}/..")
-    os.chdir(root_dir)
-    os.mkdir(logs_dir)
-if path.isfile(f"{logs_dir}/{current_date}.bin")==False:
-    f=open(f"{logs_dir}/{current_date}.bin","ab")
+if path.exists(logs_dir)==False:
+    os.makedirs(logs_dir)
+if path.isfile(f"{logs_dir}/{current_date}.md")==False:
+    f=open(f"{logs_dir}/{current_date}.md","ab")
 else:
-    f=open(f"{logs_dir}/{current_date}.bin","ab")
+    f=open(f"{logs_dir}/{current_date}.md","ab")
     f.write(bytearray("""
 """,'ascii'))
 # functions
@@ -56,7 +54,7 @@ def stopwatch():
             start_time=end_time-td
             start_time="{:02d}:{:02d}".format(start_time.hour,start_time.minute)
             end_time="{:02d}:{:02d}".format(end_time.hour,end_time.minute)
-            write_data=f"{name.upper()} - {start_time} - {end_time} - {duration}"
+            write_data=f"`{name.upper()}` - `{start_time}` - `{end_time}` - `{duration}`"
             write_data_bin=bytearray(write_data,'ascii')
             f.write(write_data_bin)
             print(write_data)
@@ -67,7 +65,7 @@ def check_log(date):
         log_list=log.split('.')
         log=log_list[0]
         if log==date:
-            log_read= open(f"{logs_dir}/{log}.bin",'rb')
+            log_read= open(f"{logs_dir}/{log}.md",'rb')
             data=log_read.read()
             return (data.decode('ascii'))        
 def read_log(date,name):
@@ -79,12 +77,12 @@ def read_log(date,name):
     data=data.splitlines()
     for line in data:
         line_l=line.split(' - ')
-        if line_l[0]==name.upper():
+        if line_l[0]==f'`{name.upper()}`':
             start_times.append(line_l[1])
             end_times.append(line_l[2])
             durations.append(line_l[3])
     for duration in durations:
-        dur=datetime.datetime.strptime(duration,"%H:%M:%S")
+        dur=datetime.datetime.strptime(duration,'`%H:%M:%S`')
         td=datetime.timedelta(hours=dur.hour,minutes=dur.minute,seconds=dur.second)
         tds+=td
     print(f"{name.upper()} - ",end="")
