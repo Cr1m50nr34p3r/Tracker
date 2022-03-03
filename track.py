@@ -75,7 +75,7 @@ def stopwatch():
 			write_data=f"| {name.upper()} | {start_time} | {end_time} | {duration} |"
 			f.write(write_data)
 			clear()
-			print_center(f"{name.upper()} | {start_time} | {end_time} | {duration} |")
+			print_center(f"{name.upper()} | {start_time} | {end_time} | {duration}")
 			f.close()
 			running=False
 def check_log(date):
