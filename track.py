@@ -23,12 +23,14 @@ parser.add_argument('-n', default="unnamed", help="name of the task", type=str)
 parser.add_argument('-c',default=False,help="Check logs",type=bool)
 parser.add_argument('-r',default=False,help="Read logs",type=bool)
 parser.add_argument('-s',default=False,help="start stopwatch",type=bool)
+parser.add_argument('-m',default=False,help="Summarise log file",type=bool)
 parser.add_argument('-d',default=current_date,help="date to check for",type=str)
 args=parser.parse_args()
 start=args.s
 name=args.n
 check=args.c
 date=args.d
+summarise=args.m
 read_l=args.r
 # initiate file
 if path.exists(logs_dir)==False:
@@ -47,7 +49,6 @@ def print_center_text(text:str):
 		s=line.center(shutil.get_terminal_size().columns) 
 		print(s)
 	print('\n'*center_line)
-	
 def stopwatch():
 	if path.exists(f"{logs_dir}/{def_date}")==False:
 		os.makedirs(f"{logs_dir}/{def_date}")
@@ -56,10 +57,6 @@ def stopwatch():
 		f.write("| Name | Start | End | Duration |")
 		f.write('\n')
 		f.write("| :---: | :---: | :---: |")
-		f.write('\n')
-	else:
-		f=open(f"{logs_dir}/{def_date}/track.md","a")
-		f.write('\n')
 
 	running=True
 	seconds=0
@@ -81,21 +78,21 @@ def stopwatch():
 			start_time=end_time-td
 			start_time="{:02d}:{:02d}".format(start_time.hour,start_time.minute)
 			end_time="{:02d}:{:02d}".format(end_time.hour,end_time.minute)
-			write_data=f"| {name.upper()} | {start_time} | {end_time} | {duration} |"
-			f.write(write_data)
+			write_data=f"\n| {name.upper()} | {start_time} | {end_time} | {duration} |"
+			with open(f"{logs_dir}/{def_date}/track.md",'a') as f:
+				f.write(write_data)
 			clear()
 			print_center_timer(f"{name.upper()} | {start_time} | {end_time} | {duration}")
-			f.close()
 			running=False
 def check_log(date):
 	month=datetime.datetime.strptime(date,"%d-%m-%Y").strftime("%b")
 	year=datetime.datetime.strptime(date,"%d-%m-%Y").strftime("%Y")
 	decade=str(round(int(year),-1))
-	if os.path.exists(f"{logs_dir}/{decade}s/{year}/{month}/{date}"):
-		log_read= open(f"{logs_dir}/{decade}s/{year}/{month}/{date}/track.md",'r')
+	path=f"{logs_dir}/{decade}s/{year}/{month}/{date}"
+	if os.path.exists(path):
+		log_read= open(f"{path}/track.md",'r')
 		data=log_read.read()
 		log_read.close()
-	path=f"{logs_dir}/{decade}s/{year}/{month}/{date}"
 	return data
 def read_log(date,name):
     start_times=[]
@@ -115,13 +112,32 @@ def read_log(date,name):
             td=datetime.timedelta(hours=dur.hour,minutes=dur.minute,seconds=dur.second)
             tds+=td
     return start_times,end_times,tds
+def Summarise(date):
+    data=check_log(date)
+    names=[]
+    lines=data.splitlines()
+    lines.pop(0)
+    lines.pop(1)
+    lines.pop(2)
+    ltds=[]
+    for line in lines:
+        lsp=line.split(' | ')
+        nm=lsp[0].replace('| ','')
+        if nm not in names:
+            names.append(nm)
+    names.pop(0)
+    for name in names:
+        start_times,end_times,tds=read_log(date,name)
+        ltds.append(tds)
+    return ltds,names
 
 # execute
 if __name__=="__main__":
 	pretty.install()
 	if check:
 		data=check_log(date)
-		print_center_timer(data) 
+		clear()
+		print_center_text(data) 
 	if start:
 		stopwatch()
 	if read_l:
@@ -133,5 +149,22 @@ if __name__=="__main__":
 			output+=' '*whitespaces
 			output+=f"| {start_times[i]} | {end_times[i]} |\n"
 		output+=f"TOTAL DURATION = {tds}"
+		print_center_text(output)
+
+	if summarise==True:
+		ltds,names=Summarise(date)
+		lenf=len(ltds)
+		month=datetime.datetime.strptime(date,"%d-%m-%Y").strftime("%b")
+		year=datetime.datetime.strptime(date,"%d-%m-%Y").strftime("%Y")
+		decade=str(round(int(year),-1))
+		path=f"{logs_dir}/{decade}s/{year}/{month}/{date}"
+		output=""
+		for i in range(0,lenf):
+			output+=f"| {names[i]} | {ltds[i]} |\n"
+		with open(f"{path}/summary.md","w") as f:
+			f.write(f"| Name | Duration |\n| :---: | :---: |\n")
+			f.write(output)
+		clear()
+		output=f"| Name | Duration |\n{output}"
 		print_center_text(output)
 
