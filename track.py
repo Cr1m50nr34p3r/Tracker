@@ -35,10 +35,19 @@ if path.exists(logs_dir)==False:
     os.makedirs(logs_dir)
 # functions
 clear=lambda: system('clear')
-def print_center(text:str):
-	center_line=int(shutil.get_terminal_size().lines/2)
-	s=text.center(shutil.get_terminal_size().columns) 
+def print_center_timer(text:str):
+	center_line=int(shutil.get_terminal_size().lines/2-text.count('\n')+1)
+	s=text.center(shutil.get_terminal_size().columns-text.count(' ')) 
 	print('\n'*center_line,s,'\n'*center_line,end="\r")
+def print_center_text(text:str):
+	center_line=int(shutil.get_terminal_size().lines/2-text.count('\n')+1)
+	print('\n'*center_line)
+	ltext=text.splitlines()
+	for line in ltext:
+		s=line.center(shutil.get_terminal_size().columns) 
+		print(s)
+	print('\n'*center_line)
+	
 def stopwatch():
 	if path.exists(f"{logs_dir}/{def_date}")==False:
 		os.makedirs(f"{logs_dir}/{def_date}")
@@ -61,7 +70,7 @@ def stopwatch():
 			timer="{:02d}:{:02d}:{:02d}".format(hours,mins,secs)
 			clear()
 			
-			print_center(timer)
+			print_center_timer(timer)
 			time.sleep(1)
 			seconds+=1
 		except KeyboardInterrupt:
@@ -75,7 +84,7 @@ def stopwatch():
 			write_data=f"| {name.upper()} | {start_time} | {end_time} | {duration} |"
 			f.write(write_data)
 			clear()
-			print_center(f"{name.upper()} | {start_time} | {end_time} | {duration}")
+			print_center_timer(f"{name.upper()} | {start_time} | {end_time} | {duration}")
 			f.close()
 			running=False
 def check_log(date):
@@ -112,16 +121,17 @@ if __name__=="__main__":
 	pretty.install()
 	if check:
 		data=check_log(date)
-		print(data) 
+		print_center_timer(data) 
 	if start:
 		stopwatch()
 	if read_l:
 		start_times,end_times,tds=read_log(date,name)
-		print(f"{name.upper()} | ",end="")
-		print(f"{start_times[0]} | {end_times[0]} |")
+		clear()
+		output=f"{name.upper()} | {start_times[0]} | {end_times[0]} |\n"
 		whitespaces=len(name)+1
 		for i in range(1,len(start_times)):
-			print(' '*whitespaces,end="")
-			print(f"| {start_times[i]} | {end_times[i]} |")
-			print(f"TOTAL DURATION = {tds}")
+			output+=' '*whitespaces
+			output+=f"| {start_times[i]} | {end_times[i]} |\n"
+		output+=f"TOTAL DURATION = {tds}"
+		print_center_text(output)
 
