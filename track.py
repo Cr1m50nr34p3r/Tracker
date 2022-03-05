@@ -8,10 +8,12 @@ import os.path as path
 import shutil
 from os import system
 from rich import print,pretty
+import platform
 # change these variables
 logs_dir=os.environ['HOME']+"/.dlogs/.Track/"
 def_date=str(round(int(datetime.datetime.now().strftime("%Y")),-1)) + "s/" + datetime.datetime.now().strftime("%Y") + "/" + datetime.datetime.now().strftime("%b") + "/" + datetime.datetime.now().strftime('%d-%m-%Y')
 # Fixed variables
+system=platform.system()
 now=datetime.datetime.now()
 current_date=datetime.datetime.now().date()
 current_date="{:02d}-{:02d}-{:04d}".format(current_date.day,current_date.month,current_date.year)
@@ -36,7 +38,11 @@ read_l=args.r
 if path.exists(logs_dir)==False:
     os.makedirs(logs_dir)
 # functions
-clear=lambda: system('clear')
+def clear():
+	if system=="Windows":
+		system('cls')
+	else:
+		system('clear')
 def print_center_timer(text:str):
 	center_line=int(shutil.get_terminal_size().lines/2-text.count('\n')+1)
 	s=text.center(shutil.get_terminal_size().columns-text.count(' '))
