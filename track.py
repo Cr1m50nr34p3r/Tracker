@@ -1,4 +1,4 @@
-#/usr/bin/python
+#!/usr/bin/python
 # imports
 import argparse
 import time
@@ -66,6 +66,7 @@ def stopwatch():
 			hours,mins=divmod(mins,60)
 			timer="{:02d}:{:02d}:{:02d}".format(hours,mins,secs)
 			clear()
+			
 			print_center_timer(timer)
 			time.sleep(1)
 			seconds+=1
@@ -109,12 +110,9 @@ def read_log(date,name):
 	for duration in durations:
 		duration=duration.replace(" |","")
 		dur=datetime.datetime.strptime(duration,'%H:%M:%S')
-#            print(dur)
-#print(f"{dur.hour}:{dur.minute}:{dur.second}")
 		td=datetime.timedelta(hours=dur.hour,minutes=dur.minute,seconds=dur.second)
-		tds=tds+td
-#            print(td)
-	return start_times,end_times,tds,durations
+		tds+=td
+	return start_times,end_times,tds
 def Summarise(date):
     data=check_log(date)
     names=[]
@@ -143,13 +141,13 @@ if __name__=="__main__":
 	if start:
 		stopwatch()
 	if read_l:
-		start_times,end_times,tds,durations=read_log(date,name)
-#		clear()
+		start_times,end_times,tds=read_log(date,name)
+		clear()
 		output=f"{name.upper()} | {start_times[0]} | {end_times[0]} |\n"
 		whitespaces=len(name)+1
 		for i in range(1,len(start_times)):
 			output+=' '*whitespaces
-			output+=f"| {start_times[i]} | {end_times[i]} | {durations[i]}\n"
+			output+=f"| {start_times[i]} | {end_times[i]} |\n"
 		output+=f"TOTAL DURATION = {tds}"
 		print_center_text(output)
 
