@@ -152,7 +152,6 @@ def Summarise(date):
         nm=lsp[0].replace('| ','')
         if nm not in names:
             names.append(nm)
-    names.pop(0)
     for name in names:
         start_times,end_times,tds=read_log(date,name)
         ltds.append(tds)
