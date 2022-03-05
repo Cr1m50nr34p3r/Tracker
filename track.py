@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#/usr/bin/python
 # imports
 import argparse
 import time
@@ -39,7 +39,7 @@ if path.exists(logs_dir)==False:
 clear=lambda: system('clear')
 def print_center_timer(text:str):
 	center_line=int(shutil.get_terminal_size().lines/2-text.count('\n')+1)
-	s=text.center(shutil.get_terminal_size().columns-text.count(' ')) 
+	s=text.center(shutil.get_terminal_size().columns-text.count(' '))
 	print('\n'*center_line,s,'\n'*center_line,end="\r")
 def print_center_text(text:str):
 	center_line=int(shutil.get_terminal_size().lines/2-text.count('\n')+1)
@@ -50,9 +50,9 @@ def print_center_text(text:str):
 		print(s)
 	print('\n'*center_line)
 def stopwatch():
-	if path.exists(f"{logs_dir}/{def_date}")==False:
+	if os.path.exists(f"{logs_dir}/{def_date}")==False:
 		os.makedirs(f"{logs_dir}/{def_date}")
-	if path.isfile(f"{logs_dir}/{def_date}/track.md")==False:
+	if os.path.isfile(f"{logs_dir}/{def_date}/track.md")==False:
 		f=open(f"{logs_dir}/{def_date}/track.md","a")
 		f.write("| Name | Start | End | Duration |")
 		f.write('\n')
@@ -66,7 +66,6 @@ def stopwatch():
 			hours,mins=divmod(mins,60)
 			timer="{:02d}:{:02d}:{:02d}".format(hours,mins,secs)
 			clear()
-			
 			print_center_timer(timer)
 			time.sleep(1)
 			seconds+=1
@@ -95,30 +94,33 @@ def check_log(date):
 		log_read.close()
 	return data
 def read_log(date,name):
-    start_times=[]
-    end_times=[]
-    durations=[]
-    tds=datetime.timedelta()
-    data=check_log(date)
-    data=data.splitlines()
-    for line in data:
-        line_l=line.split(' | ')
-        if line_l[0]==f'| {name.upper()}':
-            start_times.append(line_l[1])
-            end_times.append(line_l[2])
-            durations.append(line_l[3])
-        for duration in durations:
-            dur=datetime.datetime.strptime(duration,'%H:%M:%S |')
-            td=datetime.timedelta(hours=dur.hour,minutes=dur.minute,seconds=dur.second)
-            tds+=td
-    return start_times,end_times,tds
+	start_times=[]
+	end_times=[]
+	durations=[]
+	tds=datetime.timedelta()
+	data=check_log(date)
+	data=data.splitlines()
+	for line in data:
+		line_l=line.split(' | ')
+		if line_l[0]==f'| {name.upper()}':
+			start_times.append(line_l[1])
+			end_times.append(line_l[2])
+			durations.append(line_l[3])
+	for duration in durations:
+		duration=duration.replace(" |","")
+		dur=datetime.datetime.strptime(duration,'%H:%M:%S')
+#            print(dur)
+#print(f"{dur.hour}:{dur.minute}:{dur.second}")
+		td=datetime.timedelta(hours=dur.hour,minutes=dur.minute,seconds=dur.second)
+		tds=tds+td
+#            print(td)
+	return start_times,end_times,tds,durations
 def Summarise(date):
     data=check_log(date)
     names=[]
     lines=data.splitlines()
     lines.pop(0)
-    lines.pop(1)
-    lines.pop(2)
+    lines.pop(0)
     ltds=[]
     for line in lines:
         lsp=line.split(' | ')
@@ -141,13 +143,13 @@ if __name__=="__main__":
 	if start:
 		stopwatch()
 	if read_l:
-		start_times,end_times,tds=read_log(date,name)
-		clear()
+		start_times,end_times,tds,durations=read_log(date,name)
+#		clear()
 		output=f"{name.upper()} | {start_times[0]} | {end_times[0]} |\n"
 		whitespaces=len(name)+1
 		for i in range(1,len(start_times)):
 			output+=' '*whitespaces
-			output+=f"| {start_times[i]} | {end_times[i]} |\n"
+			output+=f"| {start_times[i]} | {end_times[i]} | {durations[i]}\n"
 		output+=f"TOTAL DURATION = {tds}"
 		print_center_text(output)
 
