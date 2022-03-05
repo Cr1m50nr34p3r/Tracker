@@ -9,6 +9,8 @@ import shutil
 from os import system
 from rich import print,pretty
 import platform
+import psutil
+import sys
 # change these variables
 logs_dir=os.environ['HOME']+"/.dlogs/.Track/"
 def_date=str(round(int(datetime.datetime.now().strftime("%Y")),-1)) + "s/" + datetime.datetime.now().strftime("%Y") + "/" + datetime.datetime.now().strftime("%b") + "/" + datetime.datetime.now().strftime('%d-%m-%Y')
@@ -38,11 +40,18 @@ read_l=args.r
 if path.exists(logs_dir)==False:
     os.makedirs(logs_dir)
 # functions
+def is_running(script:str):
+    for q in psutil.process_iter():
+        if q.name().startswith('python'):
+            if len(q.cmdline())>1 and script in q.cmdline()[1] and q.pid !=os.getpid():
+                print("'{}' Process is already running".format(script))
+                return True
+    return False
 def clear():
 	if system=="Windows":
-		system('cls')
+		os.system('cls')
 	else:
-		system('clear')
+		os.system('clear')
 def print_center_timer(text:str):
 	center_line=int(shutil.get_terminal_size().lines/2-text.count('\n')+1)
 	s=text.center(shutil.get_terminal_size().columns-text.count(' '))
@@ -136,7 +145,6 @@ def Summarise(date):
         start_times,end_times,tds=read_log(date,name)
         ltds.append(tds)
     return ltds,names
-
 # execute
 if __name__=="__main__":
 	pretty.install()
@@ -144,7 +152,7 @@ if __name__=="__main__":
 		data=check_log(date)
 		clear()
 		print_center_text(data) 
-	if start:
+	if start and not is_running(sys.argv[0]):
 		stopwatch()
 	if read_l:
 		start_times,end_times,tds=read_log(date,name)
