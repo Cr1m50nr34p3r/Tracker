@@ -11,9 +11,7 @@ from rich import print,pretty
 import platform
 import psutil
 import sys
-# change these variables
-logs_dir=os.environ['HOME']+"/.dlogs/.Track/"
-def_date=str(round(int(datetime.datetime.now().strftime("%Y")),-1)) + "s/" + datetime.datetime.now().strftime("%Y") + "/" + datetime.datetime.now().strftime("%b") + "/" + datetime.datetime.now().strftime('%d-%m-%Y')
+
 # Fixed variables
 system=platform.system()
 now=datetime.datetime.now()
@@ -21,6 +19,14 @@ current_date=datetime.datetime.now().date()
 current_date="{:02d}-{:02d}-{:04d}".format(current_date.day,current_date.month,current_date.year)
 time_now=datetime.datetime.now().time()
 current_time= "{:02d}:{:02d}".format(time_now.hour,time_now.minute)
+
+# change these variables
+if system=="Windows":
+	logs_dir=os.getenv('USERPROFILE').replace('\\','/')+"/Desktop/.dlogs/.Track/"
+else:
+	logs_dir=os.getenv('HOME')+"/.dlogs/.Track/"
+def_date=str(round(int(datetime.datetime.now().strftime("%Y")),-1)) + "s/" + datetime.datetime.now().strftime("%Y") + "/" + datetime.datetime.now().strftime("%b") + "/" + datetime.datetime.now().strftime('%d-%m-%Y')
+
 # initiate argeparse
 parser=argparse.ArgumentParser()
 parser.add_argument('-n', default="unnamed", help="name of the task", type=str)
@@ -64,6 +70,12 @@ def print_center_text(text:str):
 		s=line.center(shutil.get_terminal_size().columns) 
 		print(s)
 	print('\n'*center_line)
+	if system=="Windows":
+		while True:
+			try:
+				time.sleep(1)
+			except KeyboardInterrupt:
+				break
 def stopwatch():
 	if os.path.exists(f"{logs_dir}/{def_date}")==False:
 		os.makedirs(f"{logs_dir}/{def_date}")
