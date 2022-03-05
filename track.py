@@ -50,7 +50,7 @@ def is_running(script:str):
     for q in psutil.process_iter():
         if q.name().startswith('python'):
             if len(q.cmdline())>1 and script in q.cmdline()[1] and q.pid !=os.getpid():
-                print("'{}' Process is already running".format(script))
+                print_center_text("'{}' Process is already running".format(script))
                 return True
     return False
 def clear():
