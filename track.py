@@ -88,7 +88,7 @@ def stopwatch():
 			with open(f"{logs_dir}/{def_date}/track.md",'a') as f:
 				f.write(write_data)
 			clear()
-			print_center_timer(f"{name.upper()} | {start_time} | {end_time} | {duration}")
+			print_center_text(f"{name.upper()} | {start_time} | {end_time} | {duration}")
 			running=False
 def check_log(date):
 	month=datetime.datetime.strptime(date,"%d-%m-%Y").strftime("%b")
