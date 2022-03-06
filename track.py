@@ -83,7 +83,7 @@ def stopwatch():
 		f=open(f"{logs_dir}/{def_date}/track.md","a")
 		f.write("| Name | Start | End | Duration |")
 		f.write('\n')
-		f.write("| :---: | :---: | :---: |")
+		f.write("| :---: | :---: | :---: | :---: |")
 
 	running=True
 	seconds=0
