@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# imports
+### imports
 import argparse
 import time
 import os
@@ -12,22 +12,22 @@ import platform
 import psutil
 import sys
 
-# Fixed variables
+### Permanent Variables
 system=platform.system()
 now=datetime.datetime.now()
 current_date=datetime.datetime.now().date()
 current_date="{:02d}-{:02d}-{:04d}".format(current_date.day,current_date.month,current_date.year)
 time_now=datetime.datetime.now().time()
 current_time= "{:02d}:{:02d}".format(time_now.hour,time_now.minute)
+def_date=str(round(int(datetime.datetime.now().strftime("%Y")),-1)) + "s/" + datetime.datetime.now().strftime("%Y") + "/" + datetime.datetime.now().strftime("%b") + "/" + datetime.datetime.now().strftime('%d-%m-%Y')
 
-# change these variables
+### Changable Variables
 if system=="Windows":
 	logs_dir=os.getenv('USERPROFILE').replace('\\','/')+"/Desktop/.dlogs/.Track/"
 else:
 	logs_dir=os.getenv('HOME')+"/.dlogs/.Track/"
-def_date=str(round(int(datetime.datetime.now().strftime("%Y")),-1)) + "s/" + datetime.datetime.now().strftime("%Y") + "/" + datetime.datetime.now().strftime("%b") + "/" + datetime.datetime.now().strftime('%d-%m-%Y')
 
-# initiate argeparse
+### Initiate ArgumentParser
 parser=argparse.ArgumentParser()
 parser.add_argument('-n', default="unnamed", help="name of the task", type=str)
 parser.add_argument('-c',default=False,help="Check logs",type=bool)
@@ -42,26 +42,34 @@ check=args.c
 date=args.d
 summarise=args.m
 read_l=args.r
-# initiate file
+
+### Check if Directory exists
 if path.exists(logs_dir)==False:
-    os.makedirs(logs_dir)
-# functions
+	os.makedirs(logs_dir)
+
+### Functions
+# Check if Script is already running
+
 def is_running(script:str):
-    for q in psutil.process_iter():
-        if q.name().startswith('python'):
-            if len(q.cmdline())>1 and script in q.cmdline()[1] and q.pid !=os.getpid():
-                print_center_text("'{}' Process is already running".format(script))
-                return True
-    return False
+	for q in psutil.process_iter():
+		if q.name().startswith('python'):
+			if len(q.cmdline())>1 and script in q.cmdline()[1] and q.pid !=os.getpid():
+				return True
+	return False
+# Clear Terminal command
+
 def clear():
 	if system=="Windows":
 		os.system('cls')
 	else:
 		os.system('clear')
+# Print Commands
+
 def print_center_timer(text:str):
 	center_line=int(shutil.get_terminal_size().lines/2-text.count('\n')+1)
 	s=text.center(shutil.get_terminal_size().columns-text.count(' '))
 	print('\n'*center_line,s,'\n'*center_line,end="\r")
+
 def print_center_text(text:str):
 	center_line=int(shutil.get_terminal_size().lines/2-text.count('\n')+1)
 	print('\n'*center_line)
@@ -76,6 +84,8 @@ def print_center_text(text:str):
 				time.sleep(1)
 			except KeyboardInterrupt:
 				break
+# Main Functions
+
 def stopwatch():
 	if os.path.exists(f"{logs_dir}/{def_date}")==False:
 		os.makedirs(f"{logs_dir}/{def_date}")
@@ -93,7 +103,7 @@ def stopwatch():
 			hours,mins=divmod(mins,60)
 			timer="{:02d}:{:02d}:{:02d}".format(hours,mins,secs)
 			clear()
-			
+
 			print_center_timer(timer)
 			time.sleep(1)
 			seconds+=1
@@ -111,6 +121,7 @@ def stopwatch():
 			clear()
 			print_center_text(f"{name.upper()} | {start_time} | {end_time} | {duration}")
 			running=False
+
 def check_log(date):
 	month=datetime.datetime.strptime(date,"%d-%m-%Y").strftime("%b")
 	year=datetime.datetime.strptime(date,"%d-%m-%Y").strftime("%Y")
@@ -121,6 +132,7 @@ def check_log(date):
 		data=log_read.read()
 		log_read.close()
 	return data
+
 def read_log(date,name):
 	start_times=[]
 	end_times=[]
@@ -140,23 +152,25 @@ def read_log(date,name):
 		td=datetime.timedelta(hours=dur.hour,minutes=dur.minute,seconds=dur.second)
 		tds+=td
 	return start_times,end_times,tds
+
 def Summarise(date):
-    data=check_log(date)
-    names=[]
-    lines=data.splitlines()
-    lines.pop(0)
-    lines.pop(0)
-    ltds=[]
-    for line in lines:
-        lsp=line.split(' | ')
-        nm=lsp[0].replace('| ','')
-        if nm not in names:
-            names.append(nm)
-    for name in names:
-        start_times,end_times,tds=read_log(date,name)
-        ltds.append(tds)
-    return ltds,names
-# execute
+	data=check_log(date)
+	names=[]
+	lines=data.splitlines()
+	lines.pop(0)
+	lines.pop(0)
+	ltds=[]
+	for line in lines:
+		lsp=line.split(' | ')
+		nm=lsp[0].replace('| ','')
+		if nm not in names:
+			names.append(nm)
+	for name in names:
+		tds=read_log(date,name)[-1]
+		ltds.append(tds)
+	return ltds,names
+# Execute as script
+
 if __name__=="__main__":
 	pretty.install()
 	if check:
@@ -165,6 +179,8 @@ if __name__=="__main__":
 		print_center_text(data) 
 	if start and not is_running(sys.argv[0]):
 		stopwatch()
+	elif start and is_running(sys.argv[0]):
+		print_center_text("'{}' Process is already running".format(sys.argv[0]))
 	if read_l:
 		start_times,end_times,tds=read_log(date,name)
 		clear()
@@ -175,7 +191,6 @@ if __name__=="__main__":
 			output+=f"| {start_times[i]} | {end_times[i]} |\n"
 		output+=f"TOTAL DURATION = {tds}"
 		print_center_text(output)
-
 	if summarise==True:
 		ltds,names=Summarise(date)
 		lenf=len(ltds)
