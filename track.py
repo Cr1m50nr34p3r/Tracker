@@ -33,11 +33,11 @@ else:
 
 # Initiate ArgumentParser
 parser = argparse.ArgumentParser()
-parser.add_argument('-n', default="unnamed", help="name of the task", type=str)
-parser.add_argument('-c', default=False, help="Check logs", type=bool)
-parser.add_argument('-r', default=False, help="Read logs", type=bool)
-parser.add_argument('-s', default=False, help="start stopwatch", type=bool)
-parser.add_argument('-m', default=False, help="Summarise log file", type=bool)
+parser.add_argument('-n', default="UNTITLED", help="name of the task", type=str)
+parser.add_argument('-c', help="Check logs", action='store_true')
+parser.add_argument('-r', help="Read logs",action='store_true')
+parser.add_argument('-s', help="start stopwatch",action='store_true')
+parser.add_argument('-m', help="Summarise log file",action='store_true')
 parser.add_argument('-d', default=current_date, help="date to check for", type=str)
 args = parser.parse_args()
 start = args.s
