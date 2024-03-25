@@ -36,7 +36,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-n', default="UNTITLED", help="name of the task", type=str)
 parser.add_argument('-c', help="Check logs", action='store_true')
 parser.add_argument('-r', help="Read logs",action='store_true')
-parser.add_argument('-s', help="start stopwatch",action='store_true')
+parser.add_argument('-s', help="start stopwatch",action='store_true',default=True)
 parser.add_argument('-m', help="Summarise log file",action='store_true')
 parser.add_argument('-d', default=current_date, help="date to check for", type=str)
 args = parser.parse_args()
@@ -196,9 +196,9 @@ if __name__ == "__main__":
         data = check_log(date)
         clear()
         print_center_text(data)
-    if start and not is_running(sys.argv[0]):
+    if start and not is_running(sys.argv[0]) and not check and not read_l and not summarise:
         stopwatch()
-    elif start and is_running(sys.argv[0]):
+    elif start and is_running(sys.argv[0]) and not check and not read_l and not summarise:
         print_center_text(f"'{sys.argv[0]}' Process is already running")
     if read_l:
         start_times, end_times, tds = read_log(date,  name)
