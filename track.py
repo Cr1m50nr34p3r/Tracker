@@ -221,7 +221,6 @@ if __name__ == "__main__":
         for i in range(0,  lenf):
             output += f"| {names[i]} | {ltds[i]} |\n"
         with open(f"{path}/summary.md",  "w") as f:
-            print(path)
             f.write("| Name | Duration |\n| :---: | :---: |\n")
             f.write(output)
         clear()
