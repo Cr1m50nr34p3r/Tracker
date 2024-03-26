@@ -109,6 +109,7 @@ def stopwatch():
 
     running = True
     seconds = 0
+    start_time = datetime.datetime.now().time()
     while running:
         try:
             mins, secs = divmod(seconds, 60)
@@ -120,11 +121,13 @@ def stopwatch():
             time.sleep(1)
             seconds += 1
         except KeyboardInterrupt:
-            dur = datetime.datetime.strptime(timer,  "%H:%M:%S")
+            end_time = datetime.datetime.now().time() 
+            end_td = datetime.timedelta(hours=end_time.hour,minutes=end_time.minute,seconds=end_time.second)
+            start_td = datetime.timedelta(hours=start_time.hour,minutes=start_time.minute,seconds=start_time.second)
+            dur = end_td-start_td
+            dur = datetime.datetime.strptime(str(dur), "%H:%M:%S")
             duration = "{:02d}:{:02d}:{:02d}".format(dur.hour, dur.minute, dur.second)
             td = datetime.timedelta(hours=dur.hour, minutes=dur.minute, seconds=dur.second)
-            end_time = now+td
-            start_time = end_time-td
             start_time = "{:02d}:{:02d}".format(start_time.hour,  start_time.minute)
             end_time = "{:02d}:{:02d}".format(end_time.hour,  end_time.minute)
             write_data = f"\n| {name.upper()} | {info.upper()} | {start_time} | {end_time} | {duration} |"
