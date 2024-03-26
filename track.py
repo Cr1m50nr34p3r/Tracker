@@ -194,7 +194,7 @@ def Summarise(date):
         if nm not in names:
             names.append(nm)
     for name in names:
-        tds = read_log(date,  name)[-1]
+        tds = read_log(date,  name)[-3]
         ltds.append(tds)
     return ltds, names
 
