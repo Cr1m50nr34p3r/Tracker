@@ -34,6 +34,7 @@ else:
 # Initiate ArgumentParser
 parser = argparse.ArgumentParser()
 parser.add_argument('-n', default="UNTITLED", help="name of the task", type=str)
+parser.add_argument('-i', default="No desc", help="Describe the task", type=str)
 parser.add_argument('-c', help="Check logs", action='store_true')
 parser.add_argument('-r', help="Read logs",action='store_true')
 parser.add_argument('-s', help="start stopwatch",action='store_true',default=True)
@@ -42,6 +43,7 @@ parser.add_argument('-d', default=current_date, help="date to check for", type=s
 args = parser.parse_args()
 start = args.s
 name = args.n
+info = args.i
 check = args.c
 date = args.d
 summarise = args.m
@@ -100,9 +102,10 @@ def stopwatch():
         os.makedirs(f"{logs_dir}/{def_date}")
     if not os.path.isfile(f"{logs_dir}/{def_date}/track.md"):
         f = open(f"{logs_dir}/{def_date}/track.md",  "a")
-        f.write("| Name | Start | End | Duration |")
+        f.write("| Name | Description | Start | End | Duration |")
         f.write('\n')
-        f.write("| :---: | :---: | :---: | :---: |")
+        f.write("| :---:" * 5)
+        f.write("|")
 
     running = True
     seconds = 0
@@ -124,12 +127,12 @@ def stopwatch():
             start_time = end_time-td
             start_time = "{:02d}:{:02d}".format(start_time.hour,  start_time.minute)
             end_time = "{:02d}:{:02d}".format(end_time.hour,  end_time.minute)
-            write_data = f"\n| {name.upper()} | {start_time} | {end_time} | {duration} |"
+            write_data = f"\n| {name.upper()} | {info.upper()} | {start_time} | {end_time} | {duration} |"
             with open(f"{logs_dir}/{def_date}/track.md",  'a') as f:
                 f.write(write_data)
             clear()
             print_center_text(
-                    f"{name.upper()} | {start_time} | {end_time} | {duration}"
+                    f"{name.upper()} | {info.upper()} | {start_time} | {end_time} | {duration}"
                     )
             running = False
 
@@ -150,15 +153,16 @@ def read_log(date,   name):
     start_times = []
     end_times = []
     durations = []
+    durs = []
     tds = datetime.timedelta()
     data = check_log(date)
     data = data.splitlines()
     for line in data:
         line_l = line.split(' | ')
         if line_l[0] == f'| {name.upper()}':
-            start_times.append(line_l[1])
-            end_times.append(line_l[2])
-            durations.append(line_l[3])
+            start_times.append(line_l[-3])
+            end_times.append(line_l[-2])
+            durations.append(line_l[-1])
     for duration in durations:
         duration = duration.replace(" |",  "")
         dur = datetime.datetime.strptime(duration,  '%H:%M:%S')
@@ -167,8 +171,9 @@ def read_log(date,   name):
                 minutes=dur.minute,
                 seconds=dur.second
                 )
+        durs.append(td)
         tds += td
-    return start_times, end_times, tds
+    return start_times, end_times, tds, durs
 
 
 def Summarise(date):
@@ -196,21 +201,19 @@ if __name__ == "__main__":
         data = check_log(date)
         clear()
         print_center_text(data)
-    if start and not is_running(sys.argv[0]) and not check and not read_l and not summarise:
-        stopwatch()
-    elif start and is_running(sys.argv[0]) and not check and not read_l and not summarise:
-        print_center_text(f"'{sys.argv[0]}' Process is already running")
-    if read_l:
-        start_times, end_times, tds = read_log(date,  name)
-        clear()
-        output = f"{name.upper()} | {start_times[0]} | {end_times[0]} |\n"
+    elif read_l:
+        start_times, end_times, tds, durs= read_log(date,  name)
+        # clear()
+        output = f"{name.upper()} | {start_times[0]} | {end_times[0]} | {durs[0]} |\n"
         whitespaces = len(name)+1
         for i in range(1,  len(start_times)):
             output += ' '*whitespaces
-            output += f"| {start_times[i]} | {end_times[i]} |\n"
-            output += f"TOTAL DURATION  =  {tds}"
-        print_center_text(output)
-    if summarise:
+            output += f"| {start_times[i]} | {end_times[i]} | {durs[0]} |\n"
+
+        output += f"TOTAL DURATION  =  {tds}"
+        print(output)
+        # print_center_text(output)
+    elif summarise:
         ltds,  names = Summarise(date)
         lenf = len(ltds)
         month = datetime.datetime.strptime(date,  "%d-%m-%Y").strftime("%b")
@@ -226,3 +229,7 @@ if __name__ == "__main__":
         clear()
         output = f"| Name | Duration |\n{output}"
         print_center_text(output)
+    elif start and not is_running(sys.argv[0]):
+        stopwatch()
+    elif start and is_running(sys.argv[0]):
+        print_center_text(f"'{sys.argv[0]}' Process is already running")
