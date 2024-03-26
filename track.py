@@ -157,6 +157,7 @@ def read_log(date,   name):
     end_times = []
     durations = []
     durs = []
+    descriptions = []
     tds = datetime.timedelta()
     data = check_log(date)
     data = data.splitlines()
@@ -166,6 +167,7 @@ def read_log(date,   name):
             start_times.append(line_l[-3])
             end_times.append(line_l[-2])
             durations.append(line_l[-1])
+            descriptions.append(line_l[1])
     for duration in durations:
         duration = duration.replace(" |",  "")
         dur = datetime.datetime.strptime(duration,  '%H:%M:%S')
@@ -176,7 +178,7 @@ def read_log(date,   name):
                 )
         durs.append(td)
         tds += td
-    return start_times, end_times, tds, durs
+    return start_times, end_times, tds, durs, descriptions
 
 
 def Summarise(date):
@@ -205,13 +207,13 @@ if __name__ == "__main__":
         clear()
         print_center_text(data)
     elif read_l:
-        start_times, end_times, tds, durs= read_log(date,  name)
+        start_times, end_times, tds, durs,descs= read_log(date,  name)
         # clear()
-        output = f"{name.upper()} | {start_times[0]} | {end_times[0]} | {durs[0]} |\n"
+        output = f"{name.upper()} | {descs[0]} | {start_times[0]} | {end_times[0]} | {durs[0]} |\n"
         whitespaces = len(name)+1
         for i in range(1,  len(start_times)):
             output += ' '*whitespaces
-            output += f"| {start_times[i]} | {end_times[i]} | {durs[0]} |\n"
+            output += f"| {descs[i]} | {start_times[i]} | {end_times[i]} | {durs[0]} |\n"
 
         output += f"TOTAL DURATION  =  {tds}"
         print(output)
